@@ -32,11 +32,9 @@ waaz:
                 international_priority: 'FedEx International Priority'
                 europe_first_international_priority: 'FedEx Europe First International Priority'
             dropoff:
-                regular_pickup: 'Enlèvement régulier'
-                request_courier: 'Demande de coursier'
-                drop_box: 'Boîte de dépôt FedEx'
-                business_service_center: 'Centre de services FedEx'
-                station: 'Agence FedEx'
+                use_scheduled_pickup: 'Enlèvement régulier / programmé (Scheduled Pickup)'
+                dropoff_at_fedex_location: 'Dépôt en agence / point relais FedEx'
+                contact_fedex_to_schedule: 'Contacter FedEx pour planifier l’enlèvement'
             packaging:
                 your_packaging: 'Emballage propre (Customer Packaging)'
                 fedex_box: 'Boîte FedEx'

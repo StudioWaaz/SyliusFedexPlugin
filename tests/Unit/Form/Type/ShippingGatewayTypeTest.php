@@ -28,7 +28,7 @@ final class ShippingGatewayTypeTest extends TypeTestCase
             'account_number' => '123456789',
             'environment' => 'sandbox',
             'service_type' => 'FEDEX_GROUND',
-            'dropoff_type' => 'REGULAR_PICKUP',
+            'dropoff_type' => 'USE_SCHEDULED_PICKUP',
             'packaging_type' => 'YOUR_PACKAGING',
             'label_image_type' => 'PDF',
             'label_stock_type' => 'PAPER_4X6',

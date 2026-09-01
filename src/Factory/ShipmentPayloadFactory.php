@@ -25,10 +25,12 @@ final class ShipmentPayloadFactory implements ShipmentPayloadFactoryInterface
 
         $accountNumber = (string) ($config['account_number'] ?? '');
         $serviceType = (string) ($config['service_type'] ?? 'FEDEX_GROUND');
-        $dropoffType = (string) ($config['dropoff_type'] ?? 'REGULAR_PICKUP');
+        $dropoffType = (string) ($config['dropoff_type'] ?? 'USE_SCHEDULED_PICKUP');
         $packagingType = (string) ($config['packaging_type'] ?? 'YOUR_PACKAGING');
         $labelImageType = (string) ($config['label_image_type'] ?? 'PDF');
         $labelStockType = (string) ($config['label_stock_type'] ?? 'PAPER_4X6');
+
+        $pickupType = $this->resolvePickupType($dropoffType);
 
         $shipper = $this->shipperFactory->createNew($shippingGateway);
         $recipient = $this->recipientFactory->createNew($shipment);
@@ -42,7 +44,7 @@ final class ShipmentPayloadFactory implements ShipmentPayloadFactoryInterface
                 'shipDatestamp' => (new \DateTime())->format('Y-m-d'),
                 'serviceType' => $serviceType,
                 'packagingType' => $packagingType,
-                'pickupType' => $dropoffType,
+                'pickupType' => $pickupType,
                 'shippingChargesPayment' => [
                     'paymentType' => 'SENDER',
                     'payor' => [
@@ -64,5 +66,15 @@ final class ShipmentPayloadFactory implements ShipmentPayloadFactoryInterface
                 'value' => $accountNumber,
             ],
         ];
+    }
+
+    private function resolvePickupType(string $dropoffType): string
+    {
+        return match (strtoupper($dropoffType)) {
+            'USE_SCHEDULED_PICKUP', 'REGULAR_PICKUP' => 'USE_SCHEDULED_PICKUP',
+            'DROPOFF_AT_FEDEX_LOCATION', 'DROP_BOX', 'BUSINESS_SERVICE_CENTER', 'STATION' => 'DROPOFF_AT_FEDEX_LOCATION',
+            'CONTACT_FEDEX_TO_SCHEDULE', 'REQUEST_COURIER' => 'CONTACT_FEDEX_TO_SCHEDULE',
+            default => 'USE_SCHEDULED_PICKUP',
+        };
     }
 }

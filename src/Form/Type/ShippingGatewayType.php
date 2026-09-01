@@ -62,13 +62,11 @@ final class ShippingGatewayType extends AbstractType
             ->add('dropoff_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_dropoff_type',
                 'choices' => [
-                    'waaz.ui.fedex.dropoff.regular_pickup' => 'REGULAR_PICKUP',
-                    'waaz.ui.fedex.dropoff.request_courier' => 'REQUEST_COURIER',
-                    'waaz.ui.fedex.dropoff.drop_box' => 'DROP_BOX',
-                    'waaz.ui.fedex.dropoff.business_service_center' => 'BUSINESS_SERVICE_CENTER',
-                    'waaz.ui.fedex.dropoff.station' => 'STATION',
+                    'waaz.ui.fedex.dropoff.use_scheduled_pickup' => 'USE_SCHEDULED_PICKUP',
+                    'waaz.ui.fedex.dropoff.dropoff_at_fedex_location' => 'DROPOFF_AT_FEDEX_LOCATION',
+                    'waaz.ui.fedex.dropoff.contact_fedex_to_schedule' => 'CONTACT_FEDEX_TO_SCHEDULE',
                 ],
-                'data' => 'REGULAR_PICKUP',
+                'data' => 'USE_SCHEDULED_PICKUP',
             ])
             ->add('packaging_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_packaging_type',
