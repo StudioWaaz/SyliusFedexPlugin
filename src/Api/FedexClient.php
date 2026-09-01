@@ -22,6 +22,9 @@ class FedexClient implements FedexClientInterface
 
     public function getAccessToken(string $clientId, string $clientSecret, bool $sandbox = true): string
     {
+        $clientId = trim($clientId);
+        $clientSecret = trim($clientSecret);
+
         $cacheKey = 'fedex_token_' . md5($clientId . '_' . ($sandbox ? 'sandbox' : 'prod'));
 
         if ($this->cache !== null) {
@@ -53,6 +56,11 @@ class FedexClient implements FedexClientInterface
 
             if ($statusCode >= 400 || !isset($data['access_token'])) {
                 $errorMessage = $data['errors'][0]['message'] ?? $data['message'] ?? 'Authentication failed with FedEx API.';
+
+                if ($statusCode === 401) {
+                    $envName = $sandbox ? 'Sandbox (Test)' : 'Production';
+                    $errorMessage .= sprintf(' (Target endpoint: %s [%s]. Verify that your API Key & Secret match this environment on developer.fedex.com)', $baseUrl, $envName);
+                }
 
                 throw new FedexApiException((string) $errorMessage, $statusCode, $data);
             }

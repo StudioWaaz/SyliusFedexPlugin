@@ -43,8 +43,8 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
 
         $config = $shippingGateway->getConfig();
 
-        $clientId = (string) ($config['client_id'] ?? '');
-        $clientSecret = (string) ($config['client_secret'] ?? '');
+        $clientId = trim((string) ($config['client_id'] ?? ''));
+        $clientSecret = trim((string) ($config['client_secret'] ?? ''));
         $environment = (string) ($config['environment'] ?? 'sandbox');
         $sandbox = $environment === 'sandbox';
         $labelImageType = (string) ($config['label_image_type'] ?? 'PDF');
