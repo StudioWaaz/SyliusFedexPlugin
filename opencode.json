@@ -1,0 +1,24 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "lsp": {
+        "symfony": {
+            "command": ["symfony-lsp"],
+            "extensions": [
+                ".php",
+                ".twig",
+                ".yaml",
+                ".yml",
+                ".xml",
+                ".json",
+                ".js",
+                ".mjs",
+                ".ts",
+                ".env",
+                ".env.local"
+            ],
+            "initialization": {
+                "workspaceTrust": true
+            }
+        }
+    }
+}
