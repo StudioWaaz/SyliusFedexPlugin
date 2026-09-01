@@ -47,17 +47,19 @@ final class ShippingGatewayType extends AbstractType
             ->add('service_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_service_type',
                 'choices' => [
-                    'waaz.ui.fedex.service.fedex_ground' => 'FEDEX_GROUND',
-                    'waaz.ui.fedex.service.fedex_express_saver' => 'FEDEX_EXPRESS_SAVER',
-                    'waaz.ui.fedex.service.standard_overnight' => 'STANDARD_OVERNIGHT',
                     'waaz.ui.fedex.service.priority_overnight' => 'PRIORITY_OVERNIGHT',
+                    'waaz.ui.fedex.service.standard_overnight' => 'STANDARD_OVERNIGHT',
                     'waaz.ui.fedex.service.first_overnight' => 'FIRST_OVERNIGHT',
+                    'waaz.ui.fedex.service.fedex_express_saver' => 'FEDEX_EXPRESS_SAVER',
                     'waaz.ui.fedex.service.fedex_2_day' => 'FEDEX_2_DAY',
-                    'waaz.ui.fedex.service.international_economy' => 'INTERNATIONAL_ECONOMY',
+                    'waaz.ui.fedex.service.fedex_regional_economy' => 'FEDEX_REGIONAL_ECONOMY',
+                    'waaz.ui.fedex.service.fedex_international_connect_plus' => 'FEDEX_INTERNATIONAL_CONNECT_PLUS',
                     'waaz.ui.fedex.service.international_priority' => 'INTERNATIONAL_PRIORITY',
+                    'waaz.ui.fedex.service.international_economy' => 'INTERNATIONAL_ECONOMY',
                     'waaz.ui.fedex.service.europe_first_international_priority' => 'EUROPE_FIRST_INTERNATIONAL_PRIORITY',
+                    'waaz.ui.fedex.service.fedex_ground' => 'FEDEX_GROUND',
                 ],
-                'data' => 'FEDEX_GROUND',
+                'data' => 'PRIORITY_OVERNIGHT',
             ])
             ->add('dropoff_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_dropoff_type',
