@@ -16,8 +16,8 @@
         "bitbag/shipping-export-plugin": "^3.0",
         "nyholm/psr7": "^1.8",
         "setono/sylius-pickup-point-plugin": "^1.1",
-        "sylius/sylius": "^1.11",
-        "whatarmy/fedex-rest": "^0.6"
+        "shipstream/fedex-rest-sdk": "^1.6",
+        "sylius/sylius": "^1.13"
     },
     "require-dev": {
         "ext-json": "*",
