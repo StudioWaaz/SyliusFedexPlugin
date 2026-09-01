@@ -1,137 +1,130 @@
 ![Logo](github.png)
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/StudioWaaz/SyliusTntPlugin/build.yml?style=for-the-badge)
-![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/quality/g/StudioWaaz/SyliusTnTPlugin?style=for-the-badge)
-# WaazSyliusTntPlugin
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/StudioWaaz/SyliusFedexPlugin/build.yml?style=for-the-badge)
+![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/quality/g/StudioWaaz/SyliusFedexPlugin?style=for-the-badge)
 
-This plugin allows you to generate shipping labels for TNT carrier.
+# WaazSyliusFedexPlugin
 
-
+This plugin allows you to integrate **FedEx REST API** into your Sylius store for shipping labels generation and pickup points / drop-off locations.
 
 ## Features
 
-- Shipping label export
-- Check that the postal code and city match for TNT : for this feature, if the country chosen is 'FR' then the city field becomes a select with city proposals from the tnt webservice
+- **FedEx Shipping Labels Export** (via `bitbag/shipping-export-plugin`)
+  - Integration with FedEx REST API v1 (`/ship/v1/shipments`)
+  - Generates labels in PDF or PNG format
+  - Automatically retrieves and assigns master tracking numbers
+- **FedEx Pickup Points / Drop-off Locations** (via `setono/sylius-pickup-point-plugin`)
+  - Searches nearest FedEx locations and drop-off points (`/location/v1/locations`)
+- **OAuth2 Token Handling** with automatic caching
+- **Sylius 1.11, 1.12 & 1.13 compatible** with native Symfony HTTP client (`symfony/http-client`)
 
+---
 
-## Installation (*exporting label part*)
+## Installation
 
-**Prerequisite**: you must first configure/install the `bitbag/shipping-export-plugin`
-
-Install plugin with composer
+### 1. Install via Composer
 
 ```bash
-composer require waaz/sylius-tnt-plugin
+composer require waaz/sylius-fedex-plugin
 ```
-Add plugin dependencies to your `config/bundles.php` file:
+
+### 2. Enable the Plugin
+
+Add the plugin to your `config/bundles.php`:
 
 ```php
 return [
-    ...
-
-    Waaz\SyliusTntPlugin\WaazSyliusTntPlugin::class => ['all' => true],
+    // ...
+    BitBag\SyliusShippingExportPlugin\BitBagSyliusShippingExportPlugin::class => ['all' => true],
+    Setono\SyliusPickupPointPlugin\SetonoSyliusPickupPointPlugin::class => ['all' => true],
+    Waaz\SyliusFedexPlugin\WaazSyliusFedexPlugin::class => ['all' => true],
 ];
 ```
 
-Add route in your `config/routes/sylius_shop.yaml` file:
+### 3. Plugin Configuration
+
+Create `config/packages/waaz_sylius_fedex_plugin.yaml`:
+
 ```yaml
-...
-waaz_tnt_shop:
-    resource: "@WaazSyliusTntPlugin/Resources/config/routing/shop_tnt.yaml"
+waaz_sylius_fedex:
+    sandbox: true      # true for sandbox/testing, false for production
+    weight_unit: 'KG'  # 'KG' or 'LB'
 ```
 
-Add parameter validation_groups in your `config/services.yaml` file:
+### 4. Enable FedEx Pickup Point Provider (Optional)
+
+In `config/packages/setono_sylius_pickup_point.yaml`:
+
 ```yaml
-parameters:
-    ...
-    sylius.form.type.checkout_address.validation_groups: ['sylius', 'tnt_address']
+setono_sylius_pickup_point:
+    providers:
+        fedex: true
 ```
 
-Run assets install command : `bin/console assets:install`
+---
 
-Add plugin asset in `templates/bundles/SyliusShopBundle/_scripts.html.twig` file
-```twig
-{% include '@SyliusUi/_javascripts.html.twig' with {'path': 'assets/shop/js/app.js'} %}
-{% include '@SyliusUi/_javascripts.html.twig' with {'path': 'bundles/waazsyliustntplugin/js/tnt-city.js'} %}
-```
+## Shipping Gateway Configuration (Admin)
 
-## Configuration
-You can configure this plugin by creating a file `config/packages/waaz_sylius_tnt_plugin`:
-```yml
-# Defaults values
-waaz_sylius_tnt:
-    username: 'login' # Enter your tnt username here. You should use an environment variable like `%env(TNT_PASSWORD)%`
-    password: 'password' # Same for password
-    sandbox: true  # Sandbox mode
-    weight_unit: 'g' # 'g' or 'kg'. Weight unit you use in your shop
-    city_select_classes: 'ui dropdown' # Classes you want for city select field
+In Sylius Admin panel:
+1. Go to **Shipping > Shipping gateways** (`/admin/shipping-gateways/new/fedex`).
+2. Fill in your FedEx credentials:
+   - **FedEx API Key (Client ID)**
+   - **FedEx Secret Key**
+   - **FedEx Account Number**
+   - **Environment** (`sandbox` or `production`)
+   - **Default Shipping Service** (`FEDEX_GROUND`, `FEDEX_EXPRESS_SAVER`, `INTERNATIONAL_PRIORITY`, etc.)
+   - **Drop-off Type** (`REGULAR_PICKUP`, `BUSINESS_SERVICE_CENTER`, `DROP_BOX`, etc.)
+   - **Packaging Type** (`YOUR_PACKAGING`, `FEDEX_BOX`, `FEDEX_ENVELOPE`, etc.)
+   - **Label format** (`PDF` or `PNG`) and **Stock type** (`PAPER_4X6`, `PAPER_8.5X11_TOP_HALF_LABEL`, etc.)
+   - **Shipper Contact and Address details**
 
-```
+---
 
-## Installation (*pickup point part*)
-
-**Prerequisite**: you must first configure/install the `setono/sylius-pickup-point-plugin`
-
-    
 ## Running Tests
 
-- PHPSpec
+- **PHPUnit (Unit Tests)**:
 
 ```bash
-vendor/bin/phpspec run
+vendor/bin/phpunit
 ```
 
-- Behat (non-JS scenarios)
+- **Behat (non-JS scenarios)**:
 
 ```bash
 vendor/bin/behat --strict --tags="~@javascript"
 ```
 
-- Behat (JS scenarios)
-
-    1. [Install Symfony CLI command](https://symfony.com/download).
-
-    2. Start Headless Chrome:
-
-    ```bash
-    google-chrome-stable --enable-automation --disable-background-networking --no-default-browser-check --no-first-run --disable-popup-blocking --disable-default-apps --allow-insecure-localhost --disable-translate --disable-extensions --no-sandbox --enable-features=Metal --headless --remote-debugging-port=9222 --window-size=2880,1800 --proxy-server='direct://' --proxy-bypass-list='*' http://127.0.0.1
-    ```
-
-    3. Install SSL certificates (only once needed) and run test application's webserver on `127.0.0.1:8080`:
-
-    ```bash
-    symfony server:ca:install
-    APP_ENV=test symfony server:start --port=8080 --dir=tests/Application/public --daemon
-    ```
-
-    4. Run Behat:
-
-    ```bash
-    vendor/bin/behat --strict --tags="@javascript"
-    ```
-
-- Psalm
-
-    ```bash
-    vendor/bin/psalm
-    ```
-    
-- PHPStan
+- **Behat (JS scenarios)**:
 
 ```bash
-vendor/bin/phpstan analyse -c phpstan.neon -l max src/  
+# 1. Start Chrome headless
+google-chrome-stable --enable-automation --disable-background-networking --no-default-browser-check --no-first-run --disable-popup-blocking --disable-default-apps --allow-insecure-localhost --disable-translate --disable-extensions --no-sandbox --enable-features=Metal --headless --remote-debugging-port=9222 --window-size=2880,1800 --proxy-server='direct://' --proxy-bypass-list='*' http://127.0.0.1 &
+
+# 2. Start test application web server
+APP_ENV=test symfony server:start --port=8080 --dir=tests/Application/public --daemon
+
+# 3. Run Behat
+vendor/bin/behat --strict --tags="@javascript"
 ```
 
-- Coding Standard
-  
+- **PHPStan**:
+
+```bash
+vendor/bin/phpstan analyse -c phpstan.neon -l max src/
+```
+
+- **Coding Standard (ECS)**:
+
 ```bash
 vendor/bin/ecs check src
 ```
 
+---
+
 ## Author
 
 - [@ehibes](https://www.github.com/ehibes) for [Studio Waaz](https://www.studiowaaz.com)
+
 ## License
 
 This plugin's source code is completely free and released under the terms of the MIT license.
-
