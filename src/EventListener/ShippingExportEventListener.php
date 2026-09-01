@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Waaz\SyliusTntPlugin\EventListener;
+namespace Waaz\SyliusFedexPlugin\EventListener;
 
 use BitBag\SyliusShippingExportPlugin\Entity\ShippingExportInterface;
 use BitBag\SyliusShippingExportPlugin\Repository\ShippingExportRepository;
 use Sylius\Bundle\ResourceBundle\Event\ResourceControllerEvent;
 use Sylius\Component\Core\Model\ShipmentInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Waaz\SyliusTntPlugin\Api\ShippingLabelFetcherInterface;
+use Waaz\SyliusFedexPlugin\Api\ShippingLabelFetcherInterface;
 use Webmozart\Assert\Assert;
 
 class ShippingExportEventListener
 {
-    public const TNT_GATEWAY_CODE = 'tnt';
+    public const FEDEX_GATEWAY_CODE = 'fedex';
 
     public function __construct(
         private Filesystem $filesystem,
@@ -32,7 +32,7 @@ class ShippingExportEventListener
         $shippingGateway = $shippingExport->getShippingGateway();
         Assert::notNull($shippingGateway);
 
-        if (self::TNT_GATEWAY_CODE !== $shippingGateway->getCode()) {
+        if (self::FEDEX_GATEWAY_CODE !== $shippingGateway->getCode()) {
             return;
         }
 
@@ -41,11 +41,22 @@ class ShippingExportEventListener
 
         $this->shippingLabelFetcher->createShipment($shippingGateway, $shipment);
 
+        if (!$this->shippingLabelFetcher->isSuccess()) {
+            return;
+        }
+
         $labelContent = $this->shippingLabelFetcher->getLabelContent();
         Assert::stringNotEmpty($labelContent);
 
-        $this->saveShippingLabel($shippingExport, $labelContent, 'pdf'); // Save label
-        $this->markShipmentAsExported($shippingExport); // Mark shipment as "Exported"
+        $labelExtension = $this->shippingLabelFetcher->getLabelExtension();
+        $trackingNumber = $this->shippingLabelFetcher->getTrackingNumber();
+
+        if ($trackingNumber !== null && $trackingNumber !== '') {
+            $shipment->setTracking($trackingNumber);
+        }
+
+        $this->saveShippingLabel($shippingExport, $labelContent, $labelExtension);
+        $this->markShipmentAsExported($shippingExport);
     }
 
     public function saveShippingLabel(
@@ -72,16 +83,16 @@ class ShippingExportEventListener
         Assert::notNull($order);
 
         /** @var string $orderNumber */
-        $orderNumber = $order->getNumber();
+        $orderNumber = (string) $order->getNumber();
 
         /** @var int $shipmentId */
-        $shipmentId = $shipment->getId();
+        $shipmentId = (int) $shipment->getId();
 
         return implode(
             '_',
             [
                 $shipmentId,
-                preg_replace('~[^A-Za-z0-9]~', '', $orderNumber),
+                (string) preg_replace('~[^A-Za-z0-9]~', '', $orderNumber),
             ],
         );
     }
