@@ -53,6 +53,6 @@ return [
     Sylius\Bundle\ApiBundle\SyliusApiBundle::class => ['all' => true],
     SyliusLabs\DoctrineMigrationsExtraBundle\SyliusLabsDoctrineMigrationsExtraBundle::class => ['all' => true],
     BitBag\SyliusShippingExportPlugin\BitBagSyliusShippingExportPlugin::class => ['all' => true],
-    Waaz\SyliusTntPlugin\WaazSyliusTntPlugin::class => ['all' => true],
+    Waaz\SyliusFedexPlugin\WaazSyliusFedexPlugin::class => ['all' => true],
     Setono\SyliusPickupPointPlugin\SetonoSyliusPickupPointPlugin::class => ['all' => true],
 ];

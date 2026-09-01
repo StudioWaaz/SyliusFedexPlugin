@@ -1,47 +1,43 @@
 <?php
 
-
-
 declare(strict_types=1);
 
-namespace Tests\Waaz\SyliusTntPlugin\Behat\Context\Ui\Admin;
+namespace Tests\Waaz\SyliusFedexPlugin\Behat\Context\Ui\Admin;
 
 use Behat\Behat\Context\Context;
-use Tests\Waaz\SyliusTntPlugin\Behat\Mocker\TntApiMocker;
 use Tests\BitBag\SyliusShippingExportPlugin\Behat\Page\Admin\ShippingExport\IndexPageInterface;
+use Tests\Waaz\SyliusFedexPlugin\Behat\Mocker\FedexApiMocker;
 
 final class ShippingExportContext implements Context
 {
-    /** @var IndexPageInterface */
-    private $indexPage;
+    private IndexPageInterface $indexPage;
 
-    /** @var TntApiMocker */
-    private $tntApiMocker;
+    private FedexApiMocker $fedexApiMocker;
 
     public function __construct(
         IndexPageInterface $indexPage,
-        TntApiMocker $tntApiMocker
+        FedexApiMocker $fedexApiMocker,
     ) {
-        $this->tntApiMocker = $tntApiMocker;
+        $this->fedexApiMocker = $fedexApiMocker;
         $this->indexPage = $indexPage;
     }
 
     /**
-     * @When I export all new shipments to dhl api
+     * @When I export all new shipments to fedex api
      */
     public function iExportAllNewShipments(): void
     {
-        $this->tntApiMocker->performActionInApiSuccessfulScope(function () {
+        $this->fedexApiMocker->performActionInApiSuccessfulScope(function () {
             $this->indexPage->exportAllShipments();
         });
     }
 
     /**
-     * @When I export first shipment to dhl api
+     * @When I export first shipment to fedex api
      */
     public function iExportFirsShipments(): void
     {
-        $this->tntApiMocker->performActionInApiSuccessfulScope(function () {
+        $this->fedexApiMocker->performActionInApiSuccessfulScope(function () {
             $this->indexPage->exportFirsShipment();
         });
     }
