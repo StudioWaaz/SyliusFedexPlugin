@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Waaz\SyliusFedexPlugin\Factory;
 
 use Sylius\Component\Core\Model\ShipmentInterface;
-use Sylius\Component\Shipping\Model\ShipmentUnitInterface;
 
 final class PackageLineItemsFactory implements PackageLineItemsFactoryInterface
 {

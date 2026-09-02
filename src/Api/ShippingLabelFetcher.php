@@ -133,8 +133,8 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
                         $decoded = base64_decode($encodedLabel, true);
                         if ($decoded !== false) {
                             $this->labelContent = $decoded;
-                             /** @var mixed $contentTypeVal */
-                             $contentTypeVal = $doc['contentType'] ?? '';
+                            /** @var mixed $contentTypeVal */
+                            $contentTypeVal = $doc['contentType'] ?? '';
                             $docType = \is_string($contentTypeVal) ? $contentTypeVal : '';
                             if (stripos($docType, 'png') !== false) {
                                 $this->labelExtension = 'png';
