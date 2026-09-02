@@ -38,7 +38,7 @@ final class ShippingGatewayContext implements Context
         RepositoryInterface $orderRepository,
         RepositoryInterface $shipmentRepository,
         EntityManagerInterface $entityManager,
-        SharedStorageInterface $sharedStorage
+        SharedStorageInterface $sharedStorage,
     ) {
         $this->defaultVariantResolver = $productVariantResolver;
         $this->shipmentRepository = $shipmentRepository;

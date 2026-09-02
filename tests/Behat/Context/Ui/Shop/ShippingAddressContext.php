@@ -1,14 +1,12 @@
 <?php
 
-
-
 declare(strict_types=1);
 
 namespace Tests\Waaz\SyliusFedexPlugin\Behat\Context\Ui\Shop;
 
-use Webmozart\Assert\Assert;
 use Behat\Behat\Context\Context;
 use Sylius\Behat\Page\Shop\Checkout\AddressPageInterface;
+use Webmozart\Assert\Assert;
 
 final class ShippingAddressContext implements Context
 {

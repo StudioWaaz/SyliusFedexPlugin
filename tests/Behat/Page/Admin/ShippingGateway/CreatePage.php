@@ -1,7 +1,5 @@
 <?php
 
-
-
 declare(strict_types=1);
 
 namespace Tests\Waaz\SyliusFedexPlugin\Behat\Page\Admin\ShippingGateway;

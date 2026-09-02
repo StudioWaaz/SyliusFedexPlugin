@@ -48,6 +48,7 @@ services:
         class: Waaz\SyliusFedexPlugin\Provider\FedexProvider
         arguments:
             - '@waaz.fedex_plugin.api.client'
+            - '@bitbag.repository.shipping_gateway'
         tags:
             - { name: 'setono_sylius_pickup_point.provider', code: fedex, label: 'FedEx' }
 

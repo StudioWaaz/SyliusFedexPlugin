@@ -10,6 +10,7 @@ use Setono\SyliusPickupPointPlugin\Model\PickupPointCode;
 use Setono\SyliusPickupPointPlugin\Model\PickupPointInterface;
 use Setono\SyliusPickupPointPlugin\Provider\Provider;
 use Sylius\Component\Core\Model\OrderInterface;
+use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Waaz\SyliusFedexPlugin\Api\Exception\FedexApiException;
 use Waaz\SyliusFedexPlugin\Api\FedexClientInterface;
 use Webmozart\Assert\Assert;
@@ -18,6 +19,7 @@ final class FedexProvider extends Provider
 {
     public function __construct(
         private FedexClientInterface $client,
+        private RepositoryInterface $shippingGatewayRepository,
         private ?string $clientId = null,
         private ?string $clientSecret = null,
         private bool $sandbox = true,
@@ -40,6 +42,21 @@ final class FedexProvider extends Provider
             return [];
         }
 
+        $clientId = $this->clientId;
+        $clientSecret = $this->clientSecret;
+        $sandbox = $this->sandbox;
+
+        if (null === $clientId || '' === $clientId || null === $clientSecret || '' === $clientSecret) {
+            $gateway = $this->shippingGatewayRepository->findOneBy(['code' => 'fedex']);
+            if (null !== $gateway) {
+                $config = $gateway->getConfig();
+                $clientId = trim((string) ($config['client_id'] ?? ''));
+                $clientSecret = trim((string) ($config['client_secret'] ?? ''));
+                $environment = (string) ($config['environment'] ?? 'sandbox');
+                $sandbox = $environment === 'sandbox';
+            }
+        }
+
         try {
             $locations = $this->client->searchLocations(
                 postalCode: $postcode,
@@ -47,9 +64,9 @@ final class FedexProvider extends Provider
                 city: $city,
                 address: $street,
                 radiusKm: 50,
-                clientId: $this->clientId,
-                clientSecret: $this->clientSecret,
-                sandbox: $this->sandbox,
+                clientId: $clientId,
+                clientSecret: $clientSecret,
+                sandbox: $sandbox,
             );
         } catch (FedexApiException $e) {
             throw new TimeoutException($e);
@@ -69,14 +86,29 @@ final class FedexProvider extends Provider
         $postcode = $data[1];
         $countryCode = $code->getCountryPart();
 
+        $clientId = $this->clientId;
+        $clientSecret = $this->clientSecret;
+        $sandbox = $this->sandbox;
+
+        if (null === $clientId || '' === $clientId || null === $clientSecret || '' === $clientSecret) {
+            $gateway = $this->shippingGatewayRepository->findOneBy(['code' => 'fedex']);
+            if (null !== $gateway) {
+                $config = $gateway->getConfig();
+                $clientId = trim((string) ($config['client_id'] ?? ''));
+                $clientSecret = trim((string) ($config['client_secret'] ?? ''));
+                $environment = (string) ($config['environment'] ?? 'sandbox');
+                $sandbox = $environment === 'sandbox';
+            }
+        }
+
         try {
             $locations = $this->client->searchLocations(
                 postalCode: $postcode,
                 countryCode: $countryCode,
                 radiusKm: 50,
-                clientId: $this->clientId,
-                clientSecret: $this->clientSecret,
-                sandbox: $this->sandbox,
+                clientId: $clientId,
+                clientSecret: $clientSecret,
+                sandbox: $sandbox,
             );
         } catch (FedexApiException $e) {
             return null;

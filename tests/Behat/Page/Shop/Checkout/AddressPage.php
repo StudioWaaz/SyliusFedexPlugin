@@ -16,21 +16,22 @@ namespace Tests\Waaz\SyliusFedexPlugin\Behat\Page\Shop\Checkout;
 use Behat\Mink\Element\NodeElement;
 use Sylius\Behat\Page\Shop\Checkout\AddressPage as BaseAddressPage;
 
-class AddressPage extends BaseAddressPage {
-
+class AddressPage extends BaseAddressPage
+{
     public function selectBillingCountry(string $country): void
     {
         $this->getElement('billing_country')->selectOption($country);
     }
-    
+
     public function selectBillingPostcode(string $postcode): void
     {
         $this->getElement('billing_postcode')->setValue($postcode);
     }
-    
+
     public function getAvailableBillingCities(): array
     {
         $this->waitForOption(5, 'billing_city_select');
+
         return $this->getOptionsFromSelect($this->getElement('billing_city_select'));
     }
 
@@ -56,7 +57,7 @@ class AddressPage extends BaseAddressPage {
             $element->findAll('css', 'option[value!=""]'),
         );
     }
-    
+
     private function waitForElement(int $timeout, string $elementName): bool
     {
         return $this->getDocument()->waitFor($timeout, fn () => $this->hasElement($elementName));

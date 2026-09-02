@@ -31,7 +31,7 @@ final class ShippingContext implements Context
         SelectShippingPageInterface $selectShippingPage,
         CompletePageInterface $completePage,
         SharedStorageInterface $sharedStorage,
-        RepositoryInterface $orderRepository
+        RepositoryInterface $orderRepository,
     ) {
         $this->selectShippingPage = $selectShippingPage;
         $this->completePage = $completePage;

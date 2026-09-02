@@ -1,7 +1,5 @@
 <?php
 
-
-
 declare(strict_types=1);
 
 namespace Tests\Waaz\SyliusFedexPlugin\Behat\Context\Ui\Admin;
@@ -11,8 +9,8 @@ use FriendsOfBehat\PageObjectExtension\Page\SymfonyPageInterface;
 use Sylius\Behat\NotificationType;
 use Sylius\Behat\Service\NotificationCheckerInterface;
 use Sylius\Behat\Service\Resolver\CurrentPageResolverInterface;
-use Tests\Waaz\SyliusFedexPlugin\Behat\Page\Admin\ShippingGateway\CreatePageInterface;
 use Tests\BitBag\SyliusShippingExportPlugin\Behat\Behaviour\ContainsError;
+use Tests\Waaz\SyliusFedexPlugin\Behat\Page\Admin\ShippingGateway\CreatePageInterface;
 use Webmozart\Assert\Assert;
 
 final class ShippingGatewayContext implements Context
@@ -29,7 +27,7 @@ final class ShippingGatewayContext implements Context
     public function __construct(
         CreatePageInterface $createPage,
         CurrentPageResolverInterface $currentPageResolver,
-        NotificationCheckerInterface $notificationChecker
+        NotificationCheckerInterface $notificationChecker,
     ) {
         $this->createPage = $createPage;
         $this->currentPageResolver = $currentPageResolver;
@@ -85,7 +83,7 @@ final class ShippingGatewayContext implements Context
     {
         $this->notificationChecker->checkNotification(
             'Shipping gateway has been successfully',
-            NotificationType::success()
+            NotificationType::success(),
         );
     }
 
