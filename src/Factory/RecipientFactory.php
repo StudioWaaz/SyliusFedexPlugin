@@ -24,9 +24,9 @@ final class RecipientFactory implements RecipientFactoryInterface
         $customer = $order->getCustomer();
         $emailAddress = $customer !== null ? (string) $customer->getEmail() : '';
 
-        $streetLines = array_values(array_filter([
+        $streetLines = array_filter([
             (string) $shippingAddress->getStreet(),
-        ]));
+        ]);
 
         $contact = array_filter([
             'personName' => $personName !== '' ? $personName : null,

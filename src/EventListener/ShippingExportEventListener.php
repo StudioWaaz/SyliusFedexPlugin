@@ -82,10 +82,8 @@ class ShippingExportEventListener
         $order = $shipment->getOrder();
         Assert::notNull($order);
 
-        /** @var string $orderNumber */
         $orderNumber = (string) $order->getNumber();
 
-        /** @var int $shipmentId */
         $shipmentId = (int) $shipment->getId();
 
         return implode(

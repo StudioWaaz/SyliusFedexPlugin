@@ -27,7 +27,6 @@ final class PackageLineItemsFactory implements PackageLineItemsFactoryInterface
     {
         $totalWeight = 0.0;
 
-        /** @var ShipmentUnitInterface $unit */
         foreach ($shipment->getUnits() as $unit) {
             $shippable = $unit->getShippable();
             if ($shippable !== null) {

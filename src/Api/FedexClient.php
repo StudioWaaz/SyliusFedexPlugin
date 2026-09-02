@@ -30,6 +30,7 @@ class FedexClient implements FedexClientInterface
         if ($this->cache !== null) {
             $item = $this->cache->getItem($cacheKey);
             if ($item->isHit()) {
+                /** @var mixed $cachedToken */
                 $cachedToken = $item->get();
                 if (\is_string($cachedToken) && $cachedToken !== '') {
                     return $cachedToken;
@@ -52,21 +53,34 @@ class FedexClient implements FedexClientInterface
             ]);
 
             $statusCode = $response->getStatusCode();
+            /** @var array<string, mixed> $data */
             $data = $response->toArray(false);
 
             if ($statusCode >= 400 || !isset($data['access_token'])) {
-                $errorMessage = $data['errors'][0]['message'] ?? $data['message'] ?? 'Authentication failed with FedEx API.';
+                /** @var mixed $errors */
+                $errors = $data['errors'] ?? null;
+                /** @var mixed $firstError */
+                $firstError = \is_array($errors) ? ($errors[0] ?? null) : null;
+                /** @var mixed $msgVal */
+                $msgVal = \is_array($firstError) ? ($firstError['message'] ?? null) : null;
+                /** @var mixed $errorMsgMixed */
+                $errorMsgMixed = $msgVal ?? $data['message'] ?? 'Authentication failed with FedEx API.';
+                $errorMessage = \is_string($errorMsgMixed) ? $errorMsgMixed : 'Authentication failed with FedEx API.';
 
                 if ($statusCode === 401) {
                     $envName = $sandbox ? 'Sandbox (Test)' : 'Production';
                     $errorMessage .= sprintf(' (Target endpoint: %s [%s]. Verify that your API Key & Secret match this environment on developer.fedex.com)', $baseUrl, $envName);
                 }
 
-                throw new FedexApiException((string) $errorMessage, $statusCode, $data);
+                throw new FedexApiException($errorMessage, $statusCode, $data);
             }
 
-            $token = (string) $data['access_token'];
-            $expiresIn = isset($data['expires_in']) ? (int) $data['expires_in'] : 3600;
+            /** @var mixed $tokenVal */
+            $tokenVal = $data['access_token'];
+            $token = \is_string($tokenVal) ? $tokenVal : '';
+            /** @var mixed $expiresInVal */
+            $expiresInVal = $data['expires_in'] ?? null;
+            $expiresIn = \is_int($expiresInVal) || \is_numeric($expiresInVal) ? (int) $expiresInVal : 3600;
 
             if ($this->cache !== null) {
                 $item = $this->cache->getItem($cacheKey);
@@ -145,16 +159,30 @@ class FedexClient implements FedexClientInterface
             ]);
 
             $statusCode = $response->getStatusCode();
+            /** @var array<string, mixed> $data */
             $data = $response->toArray(false);
 
             if ($statusCode >= 400) {
-                $errorMessage = $data['errors'][0]['message'] ?? 'Failed to retrieve FedEx locations.';
+                /** @var mixed $errors */
+                $errors = $data['errors'] ?? null;
+                /** @var mixed $firstError */
+                $firstError = \is_array($errors) ? ($errors[0] ?? null) : null;
+                /** @var mixed $msgVal */
+                $msgVal = \is_array($firstError) ? ($firstError['message'] ?? null) : null;
+                /** @var mixed $errorMsgMixed */
+                $errorMsgMixed = $msgVal ?? 'Failed to retrieve FedEx locations.';
+                $errorMessage = \is_string($errorMsgMixed) ? $errorMsgMixed : 'Failed to retrieve FedEx locations.';
 
-                throw new FedexApiException((string) $errorMessage, $statusCode, $data);
+                throw new FedexApiException($errorMessage, $statusCode, $data);
             }
 
+            /** @var mixed $output */
+            $output = $data['output'] ?? [];
+            if (!\is_array($output)) {
+                $output = [];
+            }
             /** @var array<int, array<string, mixed>> $locationDetails */
-            $locationDetails = $data['output']['locationDetailList'] ?? [];
+            $locationDetails = $output['locationDetailList'] ?? [];
 
             return $locationDetails;
         } catch (\Throwable $e) {
@@ -185,12 +213,21 @@ class FedexClient implements FedexClientInterface
             ]);
 
             $statusCode = $response->getStatusCode();
+            /** @var array<string, mixed> $data */
             $data = $response->toArray(false);
 
             if ($statusCode >= 400) {
-                $errorMessage = $data['errors'][0]['message'] ?? 'FedEx shipment creation failed.';
+                /** @var mixed $errors */
+                $errors = $data['errors'] ?? null;
+                /** @var mixed $firstError */
+                $firstError = \is_array($errors) ? ($errors[0] ?? null) : null;
+                /** @var mixed $msgVal */
+                $msgVal = \is_array($firstError) ? ($firstError['message'] ?? null) : null;
+                /** @var mixed $errorMsgMixed */
+                $errorMsgMixed = $msgVal ?? 'FedEx shipment creation failed.';
+                $errorMessage = \is_string($errorMsgMixed) ? $errorMsgMixed : 'FedEx shipment creation failed.';
 
-                throw new FedexApiException((string) $errorMessage, $statusCode, $data);
+                throw new FedexApiException($errorMessage, $statusCode, $data);
             }
 
             return $data;

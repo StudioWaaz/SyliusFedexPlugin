@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaz\SyliusFedexPlugin\Provider;
 
+use BitBag\SyliusShippingExportPlugin\Entity\ShippingGatewayInterface;
 use Setono\SyliusPickupPointPlugin\Exception\TimeoutException;
 use Setono\SyliusPickupPointPlugin\Model\PickupPoint;
 use Setono\SyliusPickupPointPlugin\Model\PickupPointCode;
@@ -48,7 +49,7 @@ final class FedexProvider extends Provider
 
         if (null === $clientId || '' === $clientId || null === $clientSecret || '' === $clientSecret) {
             $gateway = $this->shippingGatewayRepository->findOneBy(['code' => 'fedex']);
-            if (null !== $gateway) {
+            if ($gateway instanceof ShippingGatewayInterface) {
                 $config = $gateway->getConfig();
                 $clientId = trim((string) ($config['client_id'] ?? ''));
                 $clientSecret = trim((string) ($config['client_secret'] ?? ''));
@@ -92,7 +93,7 @@ final class FedexProvider extends Provider
 
         if (null === $clientId || '' === $clientId || null === $clientSecret || '' === $clientSecret) {
             $gateway = $this->shippingGatewayRepository->findOneBy(['code' => 'fedex']);
-            if (null !== $gateway) {
+            if ($gateway instanceof ShippingGatewayInterface) {
                 $config = $gateway->getConfig();
                 $clientId = trim((string) ($config['client_id'] ?? ''));
                 $clientSecret = trim((string) ($config['client_secret'] ?? ''));
@@ -115,7 +116,9 @@ final class FedexProvider extends Provider
         }
 
         foreach ($locations as $item) {
-            $locId = (string) ($item['locationId'] ?? $item['locationCode'] ?? '');
+            /** @var mixed $locIdVal */
+            $locIdVal = $item['locationId'] ?? $item['locationCode'] ?? '';
+            $locId = \is_string($locIdVal) || \is_numeric($locIdVal) ? (string) $locIdVal : '';
             if ($locId === $locationId) {
                 return $this->transform($item, $countryCode);
             }
@@ -134,19 +137,67 @@ final class FedexProvider extends Provider
      */
     private function transform(array $location, string $countryCode): PickupPoint
     {
+        /** @var mixed $contactAndAddress */
         $contactAndAddress = $location['contactAndAddress'] ?? $location['locationContactAndAddress'] ?? [];
+        if (!\is_array($contactAndAddress)) {
+            $contactAndAddress = [];
+        }
+        /** @var mixed $address */
         $address = $contactAndAddress['address'] ?? [];
+        if (!\is_array($address)) {
+            $address = [];
+        }
+        /** @var mixed $contact */
         $contact = $contactAndAddress['contact'] ?? [];
+        if (!\is_array($contact)) {
+            $contact = [];
+        }
 
-        $locationId = (string) ($location['locationId'] ?? $location['locationCode'] ?? 'UNKNOWN');
-        $postalCode = (string) ($address['postalCode'] ?? '');
-        $city = (string) ($address['city'] ?? '');
-        $country = (string) ($address['countryCode'] ?? $countryCode);
+        /** @var mixed $locIdVal */
+        $locIdVal = $location['locationId'] ?? $location['locationCode'] ?? 'UNKNOWN';
+        $locationId = \is_string($locIdVal) || \is_numeric($locIdVal) ? (string) $locIdVal : 'UNKNOWN';
 
+        /** @var mixed $postalCodeVal */
+        $postalCodeVal = $address['postalCode'] ?? '';
+        $postalCode = \is_string($postalCodeVal) || \is_numeric($postalCodeVal) ? (string) $postalCodeVal : '';
+
+        /** @var mixed $cityVal */
+        $cityVal = $address['city'] ?? '';
+        $city = \is_string($cityVal) || \is_numeric($cityVal) ? (string) $cityVal : '';
+
+        /** @var mixed $countryVal */
+        $countryVal = $address['countryCode'] ?? $countryCode;
+        $country = \is_string($countryVal) || \is_numeric($countryVal) ? (string) $countryVal : $countryCode;
+
+        /** @var mixed $streetLines */
         $streetLines = $address['streetLines'] ?? [];
-        $street = \is_array($streetLines) ? implode(', ', $streetLines) : (string) $streetLines;
+        /** @var array<array-key, string> $streetLinesArray */
+        $streetLinesArray = [];
+        if (\is_array($streetLines)) {
+            /** @var mixed $line */
+            foreach ($streetLines as $line) {
+                if (\is_string($line) || \is_numeric($line)) {
+                    $streetLinesArray[] = (string) $line;
+                }
+            }
+        }
+        $street = \is_array($streetLines) ? implode(', ', $streetLinesArray) : (\is_string($streetLines) || \is_numeric($streetLines) ? (string) $streetLines : '');
 
-        $name = (string) ($contact['companyName'] ?? $contact['personName'] ?? $location['locationDetail'] ?? 'FedEx Location');
+        /** @var mixed $companyNameVal */
+        $companyNameVal = $contact['companyName'] ?? null;
+        /** @var mixed $personNameVal */
+        $personNameVal = $contact['personName'] ?? null;
+        /** @var mixed $locationDetailVal */
+        $locationDetailVal = $location['locationDetail'] ?? null;
+
+        $name = 'FedEx Location';
+        if (\is_string($companyNameVal) && $companyNameVal !== '') {
+            $name = $companyNameVal;
+        } elseif (\is_string($personNameVal) && $personNameVal !== '') {
+            $name = $personNameVal;
+        } elseif (\is_string($locationDetailVal) && $locationDetailVal !== '') {
+            $name = $locationDetailVal;
+        }
 
         $pickupPoint = new PickupPoint();
         $pickupId = $locationId . '###' . $postalCode . '###' . $city;
@@ -159,10 +210,18 @@ final class FedexProvider extends Provider
         $pickupPoint->setCity($city);
         $pickupPoint->setCountry($country);
 
+        /** @var mixed $coordinates */
         $coordinates = $address['geoCoordinates'] ?? $address['geographicCoordinates'] ?? $location['geoPositionalCoordinates'] ?? [];
-        if (isset($coordinates['latitude'], $coordinates['longitude'])) {
-            $pickupPoint->setLatitude((float) $coordinates['latitude']);
-            $pickupPoint->setLongitude((float) $coordinates['longitude']);
+        if (\is_array($coordinates) && isset($coordinates['latitude'], $coordinates['longitude'])) {
+            /** @var mixed $latitudeVal */
+            $latitudeVal = $coordinates['latitude'];
+            /** @var mixed $longitudeVal */
+            $longitudeVal = $coordinates['longitude'];
+            if ((\is_float($latitudeVal) || \is_numeric($latitudeVal) || \is_string($latitudeVal)) &&
+                (\is_float($longitudeVal) || \is_numeric($longitudeVal) || \is_string($longitudeVal))) {
+                $pickupPoint->setLatitude((float) $latitudeVal);
+                $pickupPoint->setLongitude((float) $longitudeVal);
+            }
         }
 
         return $pickupPoint;

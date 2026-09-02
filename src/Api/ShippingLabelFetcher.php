@@ -98,31 +98,52 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
     {
         Assert::isArray($this->response, 'FedEx response is empty.');
 
-        $transactionShipments = $this->response['output']['transactionShipments'] ?? [];
-        if ($transactionShipments === []) {
+        /** @var mixed $output */
+        $output = $this->response['output'] ?? [];
+        if (!\is_array($output)) {
             return;
         }
 
+        /** @var mixed $transactionShipments */
+        $transactionShipments = $output['transactionShipments'] ?? [];
+        if (!\is_array($transactionShipments) || $transactionShipments === []) {
+            return;
+        }
+
+        /** @var mixed $shipmentData */
         $shipmentData = $transactionShipments[0] ?? [];
+        if (!\is_array($shipmentData)) {
+            return;
+        }
         $this->trackingNumber = (string) ($shipmentData['masterTrackingNumber'] ?? '');
 
+        /** @var mixed $pieceResponses */
         $pieceResponses = $shipmentData['pieceResponses'] ?? [];
-        foreach ($pieceResponses as $piece) {
-            $packageDocuments = $piece['packageDocuments'] ?? [];
-            foreach ($packageDocuments as $doc) {
-                $encodedLabel = $doc['encodedLabel'] ?? null;
-                if (\is_string($encodedLabel) && $encodedLabel !== '') {
-                    $decoded = base64_decode($encodedLabel, true);
-                    if ($decoded !== false) {
-                        $this->labelContent = $decoded;
-                        $docType = (string) ($doc['contentType'] ?? '');
-                        if (stripos($docType, 'png') !== false) {
-                            $this->labelExtension = 'png';
-                        } else {
-                            $this->labelExtension = 'pdf';
-                        }
+        if (\is_array($pieceResponses)) {
+            foreach ($pieceResponses as $piece) {
+                if (!\is_array($piece)) {
+                    continue;
+                }
+                /** @var array<array-key, array<string, mixed>> $packageDocuments */
+                $packageDocuments = $piece['packageDocuments'] ?? [];
+                foreach ($packageDocuments as $doc) {
+                    /** @var mixed $encodedLabel */
+                    $encodedLabel = $doc['encodedLabel'] ?? null;
+                    if (\is_string($encodedLabel) && $encodedLabel !== '') {
+                        $decoded = base64_decode($encodedLabel, true);
+                        if ($decoded !== false) {
+                            $this->labelContent = $decoded;
+                             /** @var mixed $contentTypeVal */
+                             $contentTypeVal = $doc['contentType'] ?? '';
+                            $docType = \is_string($contentTypeVal) ? $contentTypeVal : '';
+                            if (stripos($docType, 'png') !== false) {
+                                $this->labelExtension = 'png';
+                            } else {
+                                $this->labelExtension = 'pdf';
+                            }
 
-                        return;
+                            return;
+                        }
                     }
                 }
             }
@@ -134,7 +155,11 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
         try {
             $session = $this->requestStack->getSession();
             if (method_exists($session, 'getFlashBag')) {
-                $session->getFlashBag()->add($type, $message);
+                /** @var mixed $flashBag */
+                $flashBag = $session->getFlashBag();
+                if ($flashBag instanceof FlashBagInterface) {
+                    $flashBag->add($type, $message);
+                }
             } elseif ($session instanceof SessionInterface) {
                 $flashBag = $session->getBag('flashes');
                 if ($flashBag instanceof FlashBagInterface) {
