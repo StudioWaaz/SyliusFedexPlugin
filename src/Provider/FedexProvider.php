@@ -134,7 +134,7 @@ final class FedexProvider extends Provider
      */
     private function transform(array $location, string $countryCode): PickupPoint
     {
-        $contactAndAddress = $location['locationContactAndAddress'] ?? [];
+        $contactAndAddress = $location['contactAndAddress'] ?? $location['locationContactAndAddress'] ?? [];
         $address = $contactAndAddress['address'] ?? [];
         $contact = $contactAndAddress['contact'] ?? [];
 
@@ -159,7 +159,7 @@ final class FedexProvider extends Provider
         $pickupPoint->setCity($city);
         $pickupPoint->setCountry($country);
 
-        $coordinates = $address['geoCoordinates'] ?? $address['geographicCoordinates'] ?? [];
+        $coordinates = $address['geoCoordinates'] ?? $address['geographicCoordinates'] ?? $location['geoPositionalCoordinates'] ?? [];
         if (isset($coordinates['latitude'], $coordinates['longitude'])) {
             $pickupPoint->setLatitude((float) $coordinates['latitude']);
             $pickupPoint->setLongitude((float) $coordinates['longitude']);
