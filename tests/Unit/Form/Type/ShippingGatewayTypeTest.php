@@ -27,7 +27,7 @@ final class ShippingGatewayTypeTest extends TypeTestCase
             'client_secret' => 'sample_secret',
             'account_number' => '123456789',
             'environment' => 'sandbox',
-            'service_type' => 'FEDEX_GROUND',
+            'service_type' => 'PRIORITY_OVERNIGHT',
             'dropoff_type' => 'USE_SCHEDULED_PICKUP',
             'packaging_type' => 'YOUR_PACKAGING',
             'label_image_type' => 'PDF',
