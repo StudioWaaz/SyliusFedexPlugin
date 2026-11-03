@@ -42,7 +42,6 @@ final class ShippingGatewayType extends AbstractType
                     'waaz.ui.fedex.sandbox' => 'sandbox',
                     'waaz.ui.fedex.production' => 'production',
                 ],
-                'data' => 'sandbox',
             ])
             ->add('service_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_service_type',
@@ -68,7 +67,6 @@ final class ShippingGatewayType extends AbstractType
                     'waaz.ui.fedex.service.fedex_regional_economy' => 'FEDEX_REGIONAL_ECONOMY',
                     'waaz.ui.fedex.service.fedex_regional_economy_freight' => 'FEDEX_REGIONAL_ECONOMY_FREIGHT',
                 ],
-                'data' => 'PRIORITY_OVERNIGHT',
             ])
             ->add('dropoff_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_dropoff_type',
@@ -77,7 +75,6 @@ final class ShippingGatewayType extends AbstractType
                     'waaz.ui.fedex.dropoff.dropoff_at_fedex_location' => 'DROPOFF_AT_FEDEX_LOCATION',
                     'waaz.ui.fedex.dropoff.contact_fedex_to_schedule' => 'CONTACT_FEDEX_TO_SCHEDULE',
                 ],
-                'data' => 'USE_SCHEDULED_PICKUP',
             ])
             ->add('packaging_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_packaging_type',
@@ -88,7 +85,6 @@ final class ShippingGatewayType extends AbstractType
                     'waaz.ui.fedex.packaging.fedex_pak' => 'FEDEX_PAK',
                     'waaz.ui.fedex.packaging.fedex_tube' => 'FEDEX_TUBE',
                 ],
-                'data' => 'YOUR_PACKAGING',
             ])
             ->add('label_image_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_label_image_type',
@@ -96,7 +92,6 @@ final class ShippingGatewayType extends AbstractType
                     'PDF' => 'PDF',
                     'PNG' => 'PNG',
                 ],
-                'data' => 'PDF',
             ])
             ->add('label_stock_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_label_stock_type',
@@ -107,7 +102,6 @@ final class ShippingGatewayType extends AbstractType
                     'PAPER_8.5X11_TOP_HALF_LABEL' => 'PAPER_8.5X11_TOP_HALF_LABEL',
                     'PAPER_8.5X11_BOTTOM_HALF_LABEL' => 'PAPER_8.5X11_BOTTOM_HALF_LABEL',
                 ],
-                'data' => 'PAPER_4X6',
             ])
             ->add('shipper_person_name', TextType::class, [
                 'label' => 'waaz.ui.fedex_shipper_person_name',
