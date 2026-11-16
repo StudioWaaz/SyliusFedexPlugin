@@ -48,7 +48,7 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
         $environment = (string) ($config['environment'] ?? 'sandbox');
         $sandbox = $environment === 'sandbox';
         $labelImageType = (string) ($config['label_image_type'] ?? 'PDF');
-        $this->labelExtension = strtolower($labelImageType);
+        $this->labelExtension = $this->resolveLabelExtension($labelImageType);
 
         try {
             $payload = $this->shipmentPayloadFactory->createNew(
@@ -136,11 +136,7 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
                             /** @var mixed $contentTypeVal */
                             $contentTypeVal = $doc['contentType'] ?? '';
                             $docType = \is_string($contentTypeVal) ? $contentTypeVal : '';
-                            if (stripos($docType, 'png') !== false) {
-                                $this->labelExtension = 'png';
-                            } else {
-                                $this->labelExtension = 'pdf';
-                            }
+                            $this->labelExtension = $this->resolveLabelExtension($docType, $this->labelExtension);
 
                             return;
                         }
@@ -148,6 +144,25 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
                 }
             }
         }
+    }
+
+    private function resolveLabelExtension(string $imageType, string $fallback = 'pdf'): string
+    {
+        $imageType = strtoupper($imageType);
+
+        if (str_contains($imageType, 'ZPL')) {
+            return 'zpl';
+        }
+
+        if (str_contains($imageType, 'PNG')) {
+            return 'png';
+        }
+
+        if (str_contains($imageType, 'PDF')) {
+            return 'pdf';
+        }
+
+        return $fallback;
     }
 
     private function addFlash(string $type, string $message): void

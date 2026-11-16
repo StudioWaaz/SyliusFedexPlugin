@@ -91,6 +91,7 @@ final class ShippingGatewayType extends AbstractType
                 'choices' => [
                     'PDF' => 'PDF',
                     'PNG' => 'PNG',
+                    'ZPL II (Zebra)' => 'ZPLII',
                 ],
             ])
             ->add('label_stock_type', ChoiceType::class, [

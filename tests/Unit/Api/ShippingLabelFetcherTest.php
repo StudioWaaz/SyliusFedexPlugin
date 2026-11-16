@@ -60,4 +60,49 @@ final class ShippingLabelFetcherTest extends TestCase
         $this->assertEquals('LABEL_PDF_BINARY_CONTENT', $fetcher->getLabelContent());
         $this->assertEquals('pdf', $fetcher->getLabelExtension());
     }
+
+    public function testCreateShipmentWithZebraLabel(): void
+    {
+        $requestStack = new RequestStack();
+        $client = $this->createMock(FedexClientInterface::class);
+        $payloadFactory = $this->createMock(ShipmentPayloadFactoryInterface::class);
+
+        $gateway = $this->createMock(ShippingGatewayInterface::class);
+        $gateway->method('getConfig')->willReturn([
+            'client_id' => 'test_client_id',
+            'client_secret' => 'test_client_secret',
+            'environment' => 'sandbox',
+            'label_image_type' => 'ZPLII',
+        ]);
+
+        $shipment = $this->createMock(ShipmentInterface::class);
+        $payloadFactory->method('createNew')->willReturn(['payload' => 'dummy']);
+
+        $client->method('createShipment')->willReturn([
+            'output' => [
+                'transactionShipments' => [
+                    [
+                        'masterTrackingNumber' => '123456789012',
+                        'pieceResponses' => [
+                            [
+                                'packageDocuments' => [
+                                    [
+                                        'contentType' => 'ZPLII',
+                                        'encodedLabel' => base64_encode('^XA^FO20,20^FDZEBRA^FS^XZ'),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fetcher = new ShippingLabelFetcher($requestStack, $client, $payloadFactory, 'KG');
+        $fetcher->createShipment($gateway, $shipment);
+
+        $this->assertTrue($fetcher->isSuccess());
+        $this->assertEquals('^XA^FO20,20^FDZEBRA^FS^XZ', $fetcher->getLabelContent());
+        $this->assertEquals('zpl', $fetcher->getLabelExtension());
+    }
 }
