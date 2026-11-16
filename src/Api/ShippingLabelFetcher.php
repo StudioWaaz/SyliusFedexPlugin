@@ -154,6 +154,10 @@ class ShippingLabelFetcher implements ShippingLabelFetcherInterface
             return 'zpl';
         }
 
+        if (str_contains($imageType, 'EPL')) {
+            return 'epl';
+        }
+
         if (str_contains($imageType, 'PNG')) {
             return 'png';
         }

@@ -89,19 +89,41 @@ final class ShippingGatewayType extends AbstractType
             ->add('label_image_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_label_image_type',
                 'choices' => [
-                    'PDF' => 'PDF',
-                    'PNG' => 'PNG',
-                    'ZPL II (Zebra)' => 'ZPLII',
+                    'Laser (feuille d’étiquettes)' => [
+                        'PDF' => 'PDF',
+                        'PNG' => 'PNG',
+                    ],
+                    'Zebra thermique' => 'ZPLII',
+                    'Eltron thermique' => 'EPL2',
                 ],
             ])
             ->add('label_stock_type', ChoiceType::class, [
                 'label' => 'waaz.ui.fedex_label_stock_type',
                 'choices' => [
-                    'PAPER_4X6' => 'PAPER_4X6',
-                    'PAPER_4X8' => 'PAPER_4X8',
-                    'PAPER_7X4.75' => 'PAPER_7X4.75',
-                    'PAPER_8.5X11_TOP_HALF_LABEL' => 'PAPER_8.5X11_TOP_HALF_LABEL',
-                    'PAPER_8.5X11_BOTTOM_HALF_LABEL' => 'PAPER_8.5X11_BOTTOM_HALF_LABEL',
+                    'Laser — feuilles d’étiquettes' => [
+                        '4 x 6' => 'PAPER_4X6',
+                        '4 x 6.75' => 'PAPER_4X675',
+                        '4 x 8' => 'PAPER_4X8',
+                        '4 x 9' => 'PAPER_4X9',
+                    ],
+                    'Laser — papier lettre' => [
+                        'Demi-feuille supérieure (8.5 x 11)' => 'PAPER_85X11_TOP_HALF_LABEL',
+                        'Demi-feuille inférieure (8.5 x 11)' => 'PAPER_85X11_BOTTOM_HALF_LABEL',
+                        'Lettre' => 'PAPER_LETTER',
+                        '7 x 4.75' => 'PAPER_7X475',
+                    ],
+                    'Thermique — sans Doc-Tab' => [
+                        '4 x 6' => 'STOCK_4X6',
+                        '4 x 6.75' => 'STOCK_4X675',
+                        '4 x 8' => 'STOCK_4X8',
+                        '4 x 9' => 'STOCK_4X9',
+                    ],
+                    'Thermique — avec Doc-Tab' => [
+                        '4 x 6.75 — Doc-Tab avant' => 'STOCK_4X675_LEADING_DOC_TAB',
+                        '4 x 6.75 — Doc-Tab arrière' => 'STOCK_4X675_TRAILING_DOC_TAB',
+                        '4 x 9 — Doc-Tab avant' => 'STOCK_4X9_LEADING_DOC_TAB',
+                        '4 x 9 — Doc-Tab arrière' => 'STOCK_4X9_TRAILING_DOC_TAB',
+                    ],
                 ],
             ])
             ->add('shipper_person_name', TextType::class, [

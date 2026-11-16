@@ -75,7 +75,8 @@ In Sylius Admin panel:
    - **Default Shipping Service** (`FEDEX_GROUND`, `FEDEX_EXPRESS_SAVER`, `INTERNATIONAL_PRIORITY`, etc.)
    - **Drop-off Type** (`REGULAR_PICKUP`, `BUSINESS_SERVICE_CENTER`, `DROP_BOX`, etc.)
    - **Packaging Type** (`YOUR_PACKAGING`, `FEDEX_BOX`, `FEDEX_ENVELOPE`, etc.)
-   - **Label format** (`PDF`, `PNG` or `ZPLII` for Zebra printers) and **Stock type** (`PAPER_4X6`, `PAPER_8.5X11_TOP_HALF_LABEL`, etc.)
+   - **Label format**: `PDF`/`PNG` for laser, `ZPLII` for Zebra thermal, `EPL2` for Eltron thermal
+   - **Stock type**: laser (`PAPER_*`) or thermal (`STOCK_*`), including Doc-Tab variants
    - **Shipper Contact and Address details**
 
 ---

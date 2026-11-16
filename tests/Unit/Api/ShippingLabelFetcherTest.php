@@ -105,4 +105,37 @@ final class ShippingLabelFetcherTest extends TestCase
         $this->assertEquals('^XA^FO20,20^FDZEBRA^FS^XZ', $fetcher->getLabelContent());
         $this->assertEquals('zpl', $fetcher->getLabelExtension());
     }
+
+    public function testCreateShipmentWithEltronLabel(): void
+    {
+        $requestStack = new RequestStack();
+        $client = $this->createMock(FedexClientInterface::class);
+        $payloadFactory = $this->createMock(ShipmentPayloadFactoryInterface::class);
+        $gateway = $this->createMock(ShippingGatewayInterface::class);
+        $gateway->method('getConfig')->willReturn([
+            'client_id' => 'test_client_id',
+            'client_secret' => 'test_client_secret',
+            'label_image_type' => 'EPL2',
+        ]);
+        $shipment = $this->createMock(ShipmentInterface::class);
+        $payloadFactory->method('createNew')->willReturn(['payload' => 'dummy']);
+        $client->method('createShipment')->willReturn([
+            'output' => [
+                'transactionShipments' => [[
+                    'pieceResponses' => [[
+                        'packageDocuments' => [[
+                            'contentType' => 'EPL2',
+                            'encodedLabel' => base64_encode('N\nq400\nQ200,20\nA20,20,0,4,1,1,N,"ELTRON"\nP1'),
+                        ]],
+                    ]],
+                ]],
+            ],
+        ]);
+
+        $fetcher = new ShippingLabelFetcher($requestStack, $client, $payloadFactory, 'KG');
+        $fetcher->createShipment($gateway, $shipment);
+
+        $this->assertTrue($fetcher->isSuccess());
+        $this->assertEquals('epl', $fetcher->getLabelExtension());
+    }
 }
